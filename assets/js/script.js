@@ -1,26 +1,82 @@
+// Variables for dom manipulation
+const displayDay = $("#currentDay");
+const timeBlockContainer = $(".container");
+
+// Global variables and assignments
+
+
+
+// function to generate each time block row
+const createBlock = function(timeIndex) {
+  console.log("in CreateBlock");
+
+  // creates the role to hold time, textbox and save button
+  const row = $("<div>").attr("class", "row");
+
+  // adding the time column
+  const timeCol = $("<article>").attr("class", "col-2");
+  const timeSpan = $("<span>").text(timeIndex + ":00");
+  timeCol.append(timeSpan);
+  row.append(timeCol);
+
+  // Adding the text box column
+  const textareaCol = $("<article>").attr("class", "col-8");
+  const textarea = $("<textarea>");
+  textareaCol.append(textarea);
+  row.append(textareaCol);
+
+  // adding the button column
+  const buttonCol = $("<article>").attr("class", "col-2");
+  const button = $("<button>").attr("class", "btn btn-primary save-button");
+  button.text("💾");
+  buttonCol.append(button);
+  row.append(buttonCol);
+
+  // colour the rows
+  const currentTime = moment();
+  
+  if (timeIndex < Number(currentTime.format("H")) + 2) {
+    textareaCol.css('background-color', 'green');
+  } else if (timeIndex === Number(currentTime.format("H"))+2) {
+    textareaCol.css('background-color', 'red');
+  } else {
+    textareaCol.css('background-color', 'yellow');
+  }
+
+  // return the completed row
+  return (row);
+
+}
+
+// function to render the time blocks to the page
+const renderTimeBlocks = function () {
+  console.log("in renderTimeBlock")
+  // Loop to generate each input box
+  for (timeIndex = 9; timeIndex < 18; timeIndex++) {
+    // call function to generate each block
+    const block = createBlock(timeIndex);
+    timeBlockContainer.append(block);
+  }
+}
 
 
 
 
 
-// Make sure to use some JQuery to demonstrate that can
-
-
-// HTML with Header containing title Work Day Scheduler, with sub phrasing and current date in format Thursday, Sept 5th
-// When planner opened, current day is displayed at top of calendar (Use Moment to display)
 
 
 
-// page broken into time blocks of one hour from 9am to 5pm.  Do as list items generated in JS.
-// one hour time blocks, with time on left, wide line for text and button on right with disk symbol for saving an event
 
 
 // can click on timeblock and enter or edit an event.  Click on disk symbol to save.  Save to Local storage
 
 
-// past colours grey, present dark green, future in light green.  Text in black, except when changing, then it is blue
+// Text in black, except when changing, then it is blue
 
 
 // when page loads, copy events from local storage and display on page
 
+// Display today's date in Header
+displayDay.text(moment().format("dddd, MMMM Do, YYYY"));
 
+renderTimeBlocks();
