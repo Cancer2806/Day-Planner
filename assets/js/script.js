@@ -1,64 +1,63 @@
 // Variables for dom manipulation
-const displayDay = $("#currentDay");
-const timeBlockContainer = $(".container");
+const displayDay = $("#current-day");
+const contTimeBlock = $(".container");
 
 // Global variables and assignments
-
+// not required
 
 
 // function to generate each time block row
-const createBlock = function(timeIndex) {
+const createBlock = function(idxTime) {
   // creates the row to hold time, textbox and save button
-  const row = $("<div>").attr("class", "row");
+  const timeBlock = $("<div>").attr("class", "row");
 
-  // adding the time column
-  const timeCol = $("<article>").attr("class", "col-2 hour");
-  const timeSpan = $("<span>").text(timeIndex + ":00");
-  timeCol.append(timeSpan);
-  row.append(timeCol);
+  // Adding the time list on left hand side
+  const lstTime = $("<article>").attr("class", "col-2 hour");
+  const txtTime = $("<span>").text(idxTime + ":00");
+  lstTime.append(txtTime);
+  timeBlock.append(lstTime);
 
   // Adding the text box column
-  const textareaCol = $("<article>").attr("class", "col-8 time-block");
-  const textarea = $("<textarea>");
-  textarea.addClass("textarea");
-  
+  const contTextarea = $("<article>").attr("class", "col-8 time-block");
+  const textarea = $("<textarea>").attr("class", "textarea col-12");
+    
   // Check if any text in local storage for this timeSlot
-  const prevText = localStorage.getItem(timeIndex + ":00");
+  const prevText = localStorage.getItem(idxTime + ":00");
   if (prevText !== "") {
     textarea.text(prevText);
   }
-  textareaCol.append(textarea);
-  row.append(textareaCol);
 
-  // adding the button column
-  const buttonCol = $("<article>").attr("class", "col-2");
-  const button = $("<button>").attr("class", "btn btn-primary saveBtn");
-  button.text("💾");
-  buttonCol.append(button);
-  row.append(buttonCol);
+  // add the text area to the text area container and append to the time block
+  contTextarea.append(textarea);
+  timeBlock.append(contTextarea);
+  
+  // add the button to the end of the time slot
+  const contBtn = $("<article>").attr("class", "col-2");
+  const btnSave = $("<button>").attr("class", "btn btn-primary saveBtn");
+  btnSave.html("<span class='emoji'>💾</span>");
+  contBtn.append(btnSave);
+  timeBlock.append(contBtn);
 
-  // add classes for colouring the rows based on the timeslot
+  // add classes for colouring the rows based on the time slot versus the current time
   const currentTime = moment();
-  if (timeIndex < Number(currentTime.format("H"))) {
-    textareaCol.addClass("past");
-  } else if (timeIndex === Number(currentTime.format("H"))) {
-    textareaCol.addClass("present");
+  if (idxTime < Number(currentTime.format("H"))) {
+    contTextarea.addClass("past");
+  } else if (idxTime === Number(currentTime.format("H"))) {
+    contTextarea.addClass("present");
   } else {
-    textareaCol.addClass("future");
+    contTextarea.addClass("future");
   }
-
   // return the completed row
-  return (row);
-
+  return (timeBlock);
 }
 
 // function to render the time blocks to the page
 const renderTimeBlocks = function () {
-  // Loop to generate each input box
-  for (timeIndex = 9; timeIndex < 18; timeIndex++) {
+  // Loop to generate each time block
+  for (idxTime = 9; idxTime < 18; idxTime++) {
     // call function to generate each block
-    const block = createBlock(timeIndex);
-    timeBlockContainer.append(block);
+    const block = createBlock(idxTime);
+    contTimeBlock.append(block);
   }
   return;
 }
@@ -67,23 +66,22 @@ const renderTimeBlocks = function () {
 const saveItem = function (event) {
   event.preventDefault();
   const btnHit = $(event.target); 
-  // grab the text entered if any
-  const textEntered = btnHit.parent().prev().children().val();
-  // if text has been entered, store it to local storage using the time slot as a key
-  if (textEntered !== "") {
-    const timeSlot = btnHit.parent().prev().prev().children().text();
-    localStorage.setItem(timeSlot, textEntered);    
-  }
+
+  // grab the text entered and store in local storage using the time slot as the key
+  // allow entry of no text to enable removal of items
+  const textEntered = btnHit.parent().parent().prev().children().val();
+  const timeSlot = btnHit.parent().parent().prev().prev().children().text();
+  localStorage.setItem(timeSlot, textEntered);    
+
   return;
 }
 
-
-
+// Operations to run when page opened
 // Display today's date in Header
 displayDay.text(moment().format("dddd, MMMM Do, YYYY"));
 
 // render the time blocks to the page
 renderTimeBlocks();
 
-// listen for the user clicking the Save button
+// listen for user clicking on Save button
 $(document).on("click", ".saveBtn", saveItem);
